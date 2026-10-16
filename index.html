@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khin Phyu Khine | portfolio</title>
+<meta name="description" content="Khin Phyu Khine: software engineer in Seattle. Resume, projects, and what I do for fun, in a cute terminal.">
+<meta property="og:title" content="Khin Phyu Khine | portfolio">
+<meta property="og:description" content="Software engineer in Seattle. Type a command to explore my resume, projects, and hobbies.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #171426;
+    --window: #211d36;
+    --bar: #2b2645;
+    --text: #e8e3f5;
+    --dim: #9a93b8;
+    --pink: #ff9ecb;
+    --mint: #9ef0d0;
+    --lavender: #c4b5fd;
+    --yellow: #ffd98e;
+    --border: #3a3358;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f0ff;
+    --window: #fffafd;
+    --bar: #efe6fb;
+    --text: #3b3355;
+    --dim: #8a80a8;
+    --pink: #d6407f;
+    --mint: #1f9c72;
+    --lavender: #7a5cd6;
+    --yellow: #b7791f;
+    --border: #ddd0f2;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .window {
+    width: 100%;
+    max-width: 860px;
+    height: min(88vh, 760px);
+    background: var(--window);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .grip { position: absolute; right: 4px; bottom: 2px; width: 22px; height: 22px; line-height: 22px; text-align: center; color: var(--dim); cursor: nwse-resize; touch-action: none; user-select: none; font-size: 14px; }
+  .grip:hover { color: var(--pink); }
+  .titlebar {
+    background: var(--bar);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; }
+  .dot:hover { filter: brightness(1.15); transform: scale(1.15); }
+  .dot.r { background: #ff8fa3; } .dot.y { background: #ffd98e; } .dot.g { background: #9ef0d0; }
+  .title { flex: 1; text-align: center; color: var(--dim); font-size: 13px; margin-right: 44px; }
+  #screen { flex: 1; overflow-y: auto; padding: 18px 20px 8px; cursor: text; }
+  #screen::-webkit-scrollbar { width: 8px; }
+  #screen::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  .line { white-space: pre-wrap; word-break: break-word; margin: 0 0 2px; }
+  .block { margin: 6px 0 14px; }
+  .banner { color: var(--pink); white-space: pre; font-size: 14px; line-height: 1.25; margin-bottom: 8px; }
+  .bannerbox { display: inline-block; border: 1px solid var(--pink); border-radius: 10px; padding: 8px 24px; text-align: center; color: var(--pink); }
+  .bannerbox .bn { font-weight: 700; letter-spacing: .5px; }
+  .bannerbox .bs { color: var(--dim); font-size: 13px; }
+  .pink { color: var(--pink); } .mint { color: var(--mint); } .lav { color: var(--lavender); }
+  .yellow { color: var(--yellow); } .dim { color: var(--dim); } .bold { font-weight: 700; }
+  .hl { color: var(--yellow); font-weight: 700; }
+  .echo .prompt-text { color: var(--mint); }
+  h3.sec { margin: 14px 0 6px; font-size: 15px; color: var(--lavender); }
+  h3.sec:first-child { margin-top: 0; }
+  .item { margin: 0 0 12px; }
+  .role { color: var(--pink); font-weight: 700; }
+  .meta { color: var(--dim); font-size: 13px; }
+  .blurb { color: var(--text); font-size: 13px; opacity: .85; }
+  .summary { margin-bottom: 8px; }
+  ul.list { margin: 4px 0 0; padding-left: 0; list-style: none; }
+  ul.list li { margin: 2px 0; }
+  ul.list li.b { padding-left: 1.8em; text-indent: -1.8em; }
+  .tag { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 0 10px; margin: 2px 4px 2px 0; font-size: 13px; color: var(--mint); }
+  a { color: var(--mint); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: var(--pink); }
+
+  /* collapsible entries */
+  details.entry { margin: 0 0 8px; border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; }
+  details.entry[open] { border-color: var(--lavender); }
+  details.entry > summary { cursor: pointer; list-style: none; }
+  details.entry > summary::-webkit-details-marker { display: none; }
+  details.entry > summary .role::before { content: "▸ "; color: var(--lavender); }
+  details.entry[open] > summary .role::before { content: "▾ "; }
+  details.entry .body { margin-top: 6px; }
+
+  .chiprow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+  .chip {
+    background: transparent; color: var(--lavender); border: 1px solid var(--border);
+    border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--pink); color: var(--pink); }
+
+  .promptline { display: flex; align-items: center; gap: 8px; padding: 6px 20px 10px; flex-shrink: 0; }
+  .ps1 { color: var(--mint); white-space: nowrap; }
+  #cmd {
+    flex: 1; min-width: 0; background: transparent; border: none; outline: none;
+    color: var(--text); font: inherit; caret-color: var(--pink);
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 20px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  @media (max-width: 560px) {
+    body { padding: 8px; font-size: 14px; }
+    .window { height: 94vh; }
+    .ps1 .long { display: none; }
+  }
+
+  .portrait { margin: 4px 0 12px; }
+  .portrait canvas { display: block; width: 176px; height: 168px; image-rendering: pixelated; border-radius: 10px; border: 1px solid var(--border); }
+  /* pixel scenes */
+  .fun { display: flex; gap: 14px; align-items: center; margin: 0 0 12px; }
+  .pix { flex-shrink: 0; }
+  .pix canvas, .pix img { display: block; width: 144px; height: 84px; image-rendering: pixelated; border-radius: 8px; border: 1px solid var(--border); background: #000; }
+  .funtext .blurb { font-size: 13px; }
+  @media (max-width: 560px) {
+    .fun { gap: 10px; }
+    .pix canvas, .pix img { width: 108px; height: 63px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">
+    <button class="dot r" id="dotReset" title="reset size" aria-label="reset terminal size"></button>
+    <button class="dot y" id="dotSmall" title="compact" aria-label="compact terminal"></button>
+    <button class="dot g" id="dotFull" title="fullscreen" aria-label="toggle fullscreen terminal"></button>
+    <div class="title">khin@portfolio: ~ 🌸</div>
+  </div>
+
+  <div id="screen" aria-live="polite"></div>
+
+  <div class="promptline">
+    <span class="ps1">~/khin<span class="long"> 🌸</span> $</span>
+    <input id="cmd" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type a command">
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <div class="grip" id="grip" title="drag to resize" aria-hidden="true">◢</div>
+</div>
+
+<script>
+/* ============================================================
+   ✏️  EDIT YOUR CONTENT HERE
+   Tip: wrap a phrase in **double asterisks** to highlight it (great for numbers).
+   ============================================================ */
+const DATA = {
+  name: "Khin Phyu Khine",
+  tagline: "welcome to my little corner of the internet ✨",
+  // Visitor stats (privacy-friendly, no cookies). Sign up free at goatcounter.com,
+  // pick a site code, and paste it here (e.g. "khin" -> khin.goatcounter.com). Empty = tracking off.
+  goatcounter: "",
+
+  about: [
+    "hi! i'm Khin Phyu Khine 👋",
+    "",
+    "🌏 originally from yangon, myanmar 🇲🇲, now based in seattle, usa. same amount of rain energy, different accent.",
+    "",
+    "💻 by day i'm a software engineer. the 9-to-5 pays the bills so my 5-to-9 (and weekends) can be spent on the good stuff.",
+    "",
+    "🧪 i'm curious about basically everything. i learn things, poke at things, and occasionally break things (for science).",
+    "",
+    "✨ whimsical things are my weakness, and i'm currently in my mini hardware era 🔧 tiny gadgets, blinking lights, and a growing pile of small circuit boards.",
+    "",
+    "🐶 my adventure buddy is putu, a very fluffy pomeranian who comes along on all my quests and supervises with 100% cuteness.",
+    "",
+    "type 'resume' for the serious stuff or 'fun' for the rest 🌿"
+  ],
+
+  summary: "Software Development Engineer with about 2.5 years building and shipping production software for a robotics operations team. I build features from 0 to 1, improve existing tools, and care about testing, design docs, and owning problems after incidents. Interested in AI-driven robotics (perception and control) and wearable tech that improves quality of life.",
+
+  glance: [
+    { emoji: "🤖", text: "Software Development Engineer II · Amazon Robotics · Jul 2023 - present" },
+    { emoji: "📊", text: "SDE Co-op · Amazon Robotics · 2022" },
+    { emoji: "🏦", text: "Summer Analyst Intern · BlackRock · Summer 2022" },
+    { emoji: "🎓", text: "B.S. Computer Science · Georgia Tech · GPA 3.89 · Highest Honor" }
+  ],
+
+  highlights: [
+    "**~50%** faster release approvals with an automated test suite adopted by **3 teams**",
+    "**~80%** less manual operational upkeep from 2 cross-system integrations",
+    "Weekly headcount reporting in **under 5 minutes**, built to scale to **~210,000** users",
+    "Led the team's first **micro-frontend architecture**"
+  ],
+
+  experience: [
+    { role: "Software Development Engineer II", emoji: "🤖",
+      org: "Amazon Robotics", where: "Seattle, WA", when: "Jul 2023 - present",
+      blurb: "micro-frontends, full-stack apps, an AI agent, and test automation",
+      points: [
+        "Designed and launched the team's first **micro-frontend architecture**, enabling parallel feature development and recognised by engineering leadership.",
+        "Designed and shipped a full-stack web app (React + serverless AWS) that cut weekly headcount reporting to **under 5 minutes**, built to scale to about **210,000** potential users.",
+        "Added an AI agent for program allocation trend analysis and report generation, using structured system prompts and benchmarking against test scenarios to prevent hallucination.",
+        "Built an end-to-end test suite (Playwright, TypeScript) that moved a critical planning app from manual testing to automated CI/CD, cutting release-approval time by about **50%**. Adopted across **3 teams**.",
+        "Led **2** cross-system integrations to compare forecasted vs actual demand per program, improving data continuity and cutting manual operational upkeep by about **80%**.",
+        "Ran risk analysis on large-scale system deprecations to keep reliability high and maintenance low."
+      ] },
+    { role: "Software Development Engineer, Co-op", emoji: "📊",
+      org: "Amazon Robotics", where: "Seattle, WA", when: "Jan - Jun 2022 · Sep - Dec 2022",
+      blurb: "real-time dashboards for robot parts and warehouse robot uptime",
+      points: [
+        "Developed **4** React + Plotly dashboards giving real-time visibility into robotic parts development across **3** global vendors, including a standardised report flagging which vendor products fall within or outside capacity. Increased cross-team insight by **70%**.",
+        "Built a view that visualises warehouse robot uptime and downtime data to support data-driven operational decisions."
+      ] },
+    { role: "Summer Analyst Intern", emoji: "🏦",
+      org: "BlackRock", where: "", when: "Jun - Aug 2022",
+      blurb: "Angular landing pages for the Aladdin platform",
+      points: [
+        "Part of an intern initiative delivering a new portfolio-investment feature on the Aladdin platform. Built **3** Angular landing pages and partnered with UX and API teams for consistent UI patterns."
+      ] }
+  ],
+
+  education: [
+    { emoji: "🎓", what: "B.S. Computer Science", where: "Georgia Institute of Technology, Atlanta, USA", when: "May 2023",
+      lines: [
+        "GPA **3.89/4.0** · Highest Honor · Dean's List (5x) · Faculty Honors (2x)",
+        "GHC Scholarship 2021 · HackGT Best App Development 2020",
+        "Concentration: Information Internetworks and People-Computer Interaction",
+        "Coursework: AI, Linear Algebra, Multivariable Calculus, Statistics, Algorithms, Data Structures, Systems and Networks, Computer Organization, Physics I"
+      ] }
+  ],
+
+  skills: [
+    { group: "Languages", items: ["TypeScript", "JavaScript", "Python", "Java", "SQL"] },
+    { group: "Frontend & UX", items: ["React (Hooks)", "Angular", "micro-frontends", "Plotly", "Figma", "UX research"] },
+    { group: "Backend & Cloud", items: ["AWS (serverless, API gateways, NoSQL, storage)", "Firebase", "Spring Boot", "REST APIs", "system integration"] },
+    { group: "Testing & CI/CD", items: ["Playwright", "end-to-end + integration testing", "CI/CD pipelines"] },
+    { group: "AI & Data", items: ["AI agents + tool integration", "model output annotation + evaluation", "analytics dashboards", "real-time data pipelines"] },
+    { group: "Tools & Methods", items: ["Git/GitHub", "ZenHub", "VS Code", "IntelliJ", "Agile/Scrum"] },
+    { group: "Robotics foundations", items: ["linear algebra", "multivariable calculus", "statistics", "algorithms", "AI"] }
+  ],
+
+  leadership: [
+    { emoji: "🌱", role: "Organisation-Wide Co-op and Intern Mentor", org: "Amazon Robotics", when: "2024 - present",
+      points: [
+        "Mentor for co-ops and interns across a large, multi-team engineering organisation.",
+        "Organise org-wide intern and co-op presentations so interns get visibility with senior leadership.",
+        "Host check-ins with each co-op's team mentor and manager to keep timelines and deliverables coordinated."
+      ] },
+    { emoji: "🤝", role: "Community Ambassador", org: "Corporate Volunteering Program", when: "",
+      points: ["Share and host volunteer opportunities across the organisation, encouraging peers to give back locally."] },
+    { emoji: "👩‍💻", role: "Girls Who Code Educator (Volunteer Instructor)", org: "Local middle and high schools", when: "3 years",
+      points: ["Taught and mentored girls in programming, promoting women's engagement in STEM."] }
+  ],
+
+  projects: [
+    { emoji: "🐶", name: "Putu Bot", role: "Solo project", when: "in progress",
+      link: "https://github.com/khinphyukhine/putu-bot",
+      blurb: "a floating desktop pet you can chat with, powered by Claude",
+      points: [
+        "A floating, always-on-top macOS desktop widget of my pomeranian Putu. He bounces in place, spins every 5 jumps, and opens a speech-bubble chat powered by Claude.",
+        "Built with Electron and Node.js. Chat runs on the Claude API (Haiku 4.5) with a local SQLite database, so Putu remembers facts about you across sessions.",
+        "Auto-starts at login via a macOS LaunchAgent, with a tray menu to show, chat, clear memory, or quit.",
+        "Goal: get Putu contributing to my career 🐾"
+      ] },
+    { emoji: "🩺", name: "STORC (Dialysis Care App)", role: "Full-Stack Developer", when: "Aug 2022 - May 2023",
+      blurb: "a team-built app that helps find the nearest dialysis centre",
+      points: [
+        "Built the app's primary user entry and contact points in React as part of an end-to-end team build, coordinating work through Git and Agile on ZenHub.",
+        "Contributed to backend storage on Firebase and implemented on-device local storage to find and display the nearest dialysis centre."
+      ] },
+    { emoji: "🍔", name: "Ghost Kitchens", role: "UX Researcher (HCI concentration)", when: "May - Aug 2021",
+      blurb: "smart pickup-automat prototype, tested with stakeholders",
+      points: [
+        "Designed a medium-fidelity prototype for a smart pickup-automat workflow, working with field experts (including the Chick-fil-A team) and validating it with stakeholder usability testing."
+      ] },
+    { emoji: "🗣️", name: "Burmese Language Research", role: "Student Researcher, Georgia Tech Research Institute", when: "Aug 2019 - 2021",
+      blurb: "checking hate-speech detection data ahead of the 2020 Myanmar election",
+      points: [
+        "Annotated and evaluated about **1,000** model-flagged social-media records per dataset, labelling Burmese-to-English translations and hate-speech detections as accurate or inaccurate to support ML training ahead of the 2020 Myanmar election.",
+        "Contributed Burmese-language expertise, identifying where automated detection succeeded or fell short."
+      ] },
+    { emoji: "🍃", name: "Oakleaf Relief", role: "GT Grand Challenges Design Project", when: "Aug 2019 - May 2020",
+      blurb: "a fold-out emergency roof for hurricane relief",
+      points: [
+        "Designed and prototyped an emergency roof for hurricane relief, inspired by cut-and-fold paper structures that expand from a flat sheet into a rigid form. Tested a tabletop model under simulated winds (a leaf blower!) across iterations.",
+        "Presented design approaches at bi-weekly design reviews and folded critique into each iteration."
+      ] }
+  ],
+
+  fun: [
+    { emoji: "🏂", title: "snowboarding", scene: "snowboard",
+      text: "carving down mountains and pretending i'm far more graceful than i actually am." },
+    { emoji: "🎧", title: "edm concerts", scene: "edm",
+      text: "bass in my chest, lights everywhere, ears ringing the next day. worth it every time." },
+    { emoji: "🥾", title: "hiking & backpacking", scene: "hike",
+      text: "carrying my whole house on my back on purpose. i love all things outdoors." },
+    { emoji: "🧗", title: "climbing", scene: "climb",
+      text: "going up walls for fun, because apparently stairs were too easy." },
+    { emoji: "👟", title: "running (sometimes)", scene: "run",
+      text: "emphasis on the 'sometimes'. i go, i run, i feel accomplished." },
+    { emoji: "☕", title: "cafe hopping", scene: "cafe",
+      text: "always on the hunt for a cozy cafe with a good drink and good vibes." },
+    { emoji: "🍜", title: "learning burmese cooking", scene: "food",
+      text: "slowly learning to cook burmese food, one delicious (and occasionally chaotic) attempt at a time." }
+    /* want your own pixel gif instead? add  gif: "images/snowboard.gif"  to any item above */
+  ],
+
+  contact: [
+    { emoji: "📧", label: "email",    value: "kpkhine.career@gmail.com",     href: "mailto:kpkhine.career@gmail.com" },
+    { emoji: "💼", label: "linkedin", value: "linkedin.com/in/khinpkhine",   href: "https://www.linkedin.com/in/khinpkhine/" },
+    { emoji: "🐙", label: "github",   value: "github.com/khinphyukhine",     href: "https://github.com/khinphyukhine" }
+  ]
+};
+/* ============================================================ */
+
+const screen = document.getElementById("screen");
+const input = document.getElementById("cmd");
+const chipsEl = document.getElementById("chips");
+const history = []; let hIndex = 0;
+
+function el(html, cls = "block") {
+  const d = document.createElement("div");
+  d.className = cls;
+  d.innerHTML = html;
+  screen.appendChild(d);
+  screen.scrollTop = screen.scrollHeight;
+  return d;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const fmt = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<span class="hl">$1</span>');
+const meta = parts => parts.filter(Boolean).map(esc).join(" · ");
+const bullets = pts => `<ul class="list">${pts.map(p => `<li class="b">🌸 ${fmt(p)}</li>`).join("")}</ul>`;
+const chips = list => `<div class="chiprow">${list.map(([cmd, label]) => `<button class="chip" data-cmd="${esc(cmd)}">${label}</button>`).join("")}</div>`;
+const toggleChip = `<div class="chiprow"><button class="chip" data-toggle>▾ expand all</button></div>`;
+
+function entry(emoji, title, metaParts, blurb, points, open, link) {
+  return `<details class="entry"${open ? " open" : ""}><summary>
+<span class="role">${emoji} ${esc(title)}</span>
+<div class="meta">${meta(metaParts)}</div>
+<div class="blurb">${esc(blurb)}</div></summary>
+<div class="body">${bullets(points)}${link ? `<div>🔗 <a href="${esc(link)}" target="_blank" rel="noopener">view on github</a></div>` : ""}</div></details>`;
+}
+
+const SECTIONS = [
+  ["resume experience", "💼 experience"],
+  ["resume education", "🎓 education"],
+  ["resume skills", "⚡ skills"],
+  ["resume leadership", "💖 leadership"]
+];
+const moreChips = current => `<div class="dim">more:</div>` + chips([["resume", "↩ resume home"], ...SECTIONS.filter(s => s[0] !== current)]);
+
+const expHTML = () => `<h3 class="sec">💼 experience</h3>` + toggleChip +
+  DATA.experience.map((e, i) => entry(e.emoji, e.role, [e.org, e.where, e.when], e.blurb, e.points, i === 0)).join("");
+
+const eduHTML = () => `<h3 class="sec">🎓 education</h3>` + DATA.education.map(e => `<div class="item">
+<div><span class="role">${e.emoji} ${esc(e.what)}</span></div>
+<div class="meta">${meta([e.where, e.when])}</div>
+<ul class="list">${e.lines.map(l => `<li class="b">🌸 ${fmt(l)}</li>`).join("")}</ul></div>`).join("");
+
+const skillsHTML = () => `<h3 class="sec">⚡ skills</h3>` + DATA.skills.map(s => `<div class="item"><span class="lav">${esc(s.group)}</span>
+<div>${s.items.map(i => `<span class="tag">${esc(i)}</span>`).join("")}</div></div>`).join("");
+
+const leadHTML = () => `<h3 class="sec">💖 leadership &amp; community</h3>` + DATA.leadership.map(l => `<div class="item">
+<div><span class="role">${l.emoji} ${esc(l.role)}</span></div>
+<div class="meta">${meta([l.org, l.when])}</div>
+${bullets(l.points)}</div>`).join("");
+
+const commands = {
+  help() {
+    return `<h3 class="sec">📖 available commands</h3>
+<ul class="list">
+<li><span class="mint">about</span>    <span class="dim">- who i am 👋</span></li>
+<li><span class="mint">resume</span>   <span class="dim">- quick overview 💼 (then: experience, education, skills, leadership)</span></li>
+<li><span class="mint">projects</span> <span class="dim">- things i've built 🛠️</span></li>
+<li><span class="mint">fun</span>      <span class="dim">- what i do outside work 🎧</span></li>
+<li><span class="mint">contact</span>  <span class="dim">- say hi 📬</span></li>
+<li><span class="mint">size</span>     <span class="dim">- resize the terminal 📐 (or drag the corner)</span></li>
+<li><span class="mint">theme</span>    <span class="dim">- switch dark / light 🌗</span></li>
+<li><span class="mint">clear</span>    <span class="dim">- tidy the screen 🧹</span></li>
+</ul>
+<div class="dim">tip: Tab autocompletes, ↑ shows history, tap the cards to expand. psst… try 'coffee' ☕</div>`;
+  },
+  about() {
+    return `<h3 class="sec">👋 about me</h3><div class="portrait"><canvas data-scene="us" width="44" height="42" role="img" aria-label="pixel cartoon of me and my pomeranian Putu at my desk"></canvas></div>` + DATA.about.map(l => `<div class="line">${esc(l)}</div>`).join("");
+  },
+  resume() {
+    const glance = DATA.glance.map(g => `<li class="b">${g.emoji} ${esc(g.text)}</li>`).join("");
+    const hi = DATA.highlights.map(h => `<li class="b">⭐ ${fmt(h)}</li>`).join("");
+    return `<h3 class="sec">✨ career profile</h3><div class="summary">${esc(DATA.summary)}</div>
+<h3 class="sec">📌 at a glance</h3><ul class="list">${glance}</ul>
+<h3 class="sec">🏆 highlights</h3><ul class="list">${hi}</ul>
+<h3 class="sec">📂 dig deeper</h3>${chips(SECTIONS)}
+<div class="dim">or type 'resume all' to see everything at once</div>`;
+  },
+  "resume experience"() { return expHTML() + moreChips("resume experience"); },
+  "resume education"()  { return eduHTML() + moreChips("resume education"); },
+  "resume skills"()     { return skillsHTML() + moreChips("resume skills"); },
+  "resume leadership"() { return leadHTML() + moreChips("resume leadership"); },
+  "resume all"() { return expHTML() + eduHTML() + skillsHTML() + leadHTML(); },
+  projects() {
+    return `<h3 class="sec">🛠️ projects</h3><div class="dim">tap a project to see the details 👇</div>` + toggleChip +
+      DATA.projects.map((p, i) => entry(p.emoji, p.name, [p.role, p.when], p.blurb, p.points, false, p.link)).join("");
+  },
+  fun() {
+    return `<h3 class="sec">🎈 outside of work</h3><div class="dim">tiny pixel scenes, because why not 👾</div>` +
+      DATA.fun.map(f => `<div class="fun">
+<div class="pix">${f.gif ? `<img src="${esc(f.gif)}" alt="${esc(f.title)}">` : `<canvas data-scene="${esc(f.scene)}" width="48" height="28" role="img" aria-label="pixel art: ${esc(f.title)}"></canvas>`}</div>
+<div class="funtext"><div class="role">${f.emoji} ${esc(f.title)}</div><div class="blurb">${esc(f.text)}</div></div></div>`).join("");
+  },
+  contact() {
+    return `<h3 class="sec">📬 let's connect</h3><ul class="list">` +
+      DATA.contact.map(c => `<li>${c.emoji} <span class="dim">${esc(c.label)}:</span> <a href="${esc(c.href)}" target="_blank" rel="noopener">${esc(c.value)}</a></li>`).join("") + `</ul>`;
+  },
+  theme() {
+    const root = document.documentElement;
+    const next = root.dataset.theme === "light" ? "dark" : "light";
+    root.dataset.theme = next;
+    return `<span class="lav">theme set to ${next} ${next === "light" ? "☀️" : "🌙"}</span>`;
+  },
+  coffee() { return `<pre class="line yellow">    ( (\n     ) )\n  .______.\n  |      |]\n  \\      /\n   \`----'</pre><div>☕ brewing… you're now caffeinated. go build something cool.</div>`; },
+  whoami() { return `<span class="pink">${esc(DATA.name)}</span> <span class="dim">~ a human with good taste in terminals 🌸</span>`; },
+  clear() { screen.innerHTML = ""; return null; }
+};
+commands.ls = () => `<span class="lav">about/  resume/  projects/  fun/  contact/</span>`;
+
+/* ---------- adjustable terminal size ---------- */
+const win = document.querySelector(".window");
+let fullOn = false;
+function setSize(w, h, full = false) {
+  const maxW = window.innerWidth - 32, maxH = window.innerHeight - 32;
+  w = Math.max(320, Math.min(w, maxW)); h = Math.max(300, Math.min(h, maxH));
+  win.style.maxWidth = "none"; win.style.width = w + "px"; win.style.height = h + "px";
+  fullOn = full;
+}
+function resetSize() { win.style.width = win.style.height = win.style.maxWidth = ""; fullOn = false; }
+const goFull = () => setSize(1e5, 1e5, true);
+document.getElementById("dotReset").addEventListener("click", resetSize);
+document.getElementById("dotSmall").addEventListener("click", () => setSize(520, 460));
+document.getElementById("dotFull").addEventListener("click", () => (fullOn ? resetSize() : goFull()));
+const grip = document.getElementById("grip");
+grip.addEventListener("pointerdown", e => {
+  e.preventDefault(); grip.setPointerCapture(e.pointerId);
+  const r = win.getBoundingClientRect(), sx = e.clientX, sy = e.clientY;
+  // the window is centred, so it grows by 2x the drag distance to keep the corner under the pointer
+  const move = ev => setSize(r.width + 2 * (ev.clientX - sx), r.height + 2 * (ev.clientY - sy));
+  const up = () => { grip.removeEventListener("pointermove", move); grip.removeEventListener("pointerup", up); grip.removeEventListener("pointercancel", up); };
+  grip.addEventListener("pointermove", move); grip.addEventListener("pointerup", up); grip.addEventListener("pointercancel", up);
+});
+window.addEventListener("resize", () => { if (fullOn) goFull(); else if (win.style.width) setSize(parseFloat(win.style.width), parseFloat(win.style.height)); });
+commands.size = () => `<h3 class="sec">📐 terminal size</h3><div>drag the corner ◢ (bottom-right) to resize, or pick a preset:</div>` +
+  chips([["size small", "small"], ["size large", "large"], ["size full", "fullscreen"], ["size reset", "reset"]]) +
+  `<div class="dim">also: 🔴 resets · 🟡 compact · 🟢 fullscreen (the dots, top-left)</div>`;
+const sized = (label, fn) => () => { fn(); return `<span class="lav">terminal size: ${label} 📐</span>`; };
+commands["size small"] = sized("small", () => setSize(520, 460));
+commands["size large"] = sized("large", () => setSize(1100, 860));
+commands["size full"] = sized("fullscreen", goFull);
+commands["size reset"] = commands["size medium"] = sized("default", resetSize);
+
+const aliases = {
+  "resume exp": "resume experience", "resume work": "resume experience",
+  "resume edu": "resume education", "resume skill": "resume skills",
+  "resume lead": "resume leadership", "resume everything": "resume all"
+};
+const names = Object.keys(commands).filter(n => !["ls", "whoami", "coffee"].includes(n));
+
+function run(raw) {
+  let cmd = raw.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!cmd) return;
+  el(`<span class="prompt-text">~/khin 🌸 $</span> ${esc(raw)}`, "line echo");
+  cmd = aliases[cmd] || cmd;
+  trackCommand(cmd);
+  if (cmd === "sudo hire-me") {
+    el(`<span class="pink">🎉 permission granted!</span> <span class="dim">sending the offer letter to…</span> <a href="${esc(DATA.contact[0].href)}">${esc(DATA.contact[0].value)}</a> 😉`);
+  } else if (commands[cmd]) {
+    const out = commands[cmd]();
+    if (out) initScenes(el(out));
+  } else {
+    el(`<span class="pink">command not found: ${esc(raw)} 🥺</span> <span class="dim">try 'help'</span>`);
+  }
+  history.push(raw); hIndex = history.length;
+}
+
+function commonPrefix(list) {
+  return list.reduce((a, b) => { let i = 0; while (i < a.length && a[i] === b[i]) i++; return a.slice(0, i); });
+}
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") { run(input.value); input.value = ""; }
+  else if (e.key === "ArrowUp") { if (hIndex > 0) input.value = history[--hIndex]; e.preventDefault(); }
+  else if (e.key === "ArrowDown") { input.value = hIndex < history.length - 1 ? history[++hIndex] : (hIndex = history.length, ""); e.preventDefault(); }
+  else if (e.key === "Tab") {
+    e.preventDefault();
+    const m = names.filter(n => n.startsWith(input.value.toLowerCase()));
+    if (m.length) input.value = commonPrefix(m);
+  }
+});
+
+screen.addEventListener("click", e => {
+  const c = e.target.closest("[data-cmd]");
+  if (c) { run(c.dataset.cmd); return; }
+  const t = e.target.closest("[data-toggle]");
+  if (t) {
+    const ds = [...t.closest(".block").querySelectorAll("details")];
+    const openThem = ds.some(d => !d.open);
+    ds.forEach(d => d.open = openThem);
+    t.textContent = openThem ? "▴ collapse all" : "▾ expand all";
+    return;
+  }
+  if (e.target.closest("summary, a, button")) return;
+  if (!getSelection().toString()) input.focus();
+});
+
+["about", "resume", "projects", "fun", "contact", "help", "theme", "clear"].forEach(c => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = c;
+  b.addEventListener("click", () => { run(c); });
+  chipsEl.appendChild(b);
+});
+
+/* ---------- pixel scenes (drawn in code on a 48x28 grid) ---------- */
+const PW = 48, PH = 28;
+const mod = (a, n) => ((a % n) + n) % n;
+const steam = (r, x0, y0, t, n) => {
+  for (let k = 0; k < n; k++) for (let j = 0; j < 6; j++) {
+    const x = x0 + k * 4 + Math.round(Math.sin(t * 3 + j * 0.9 + k * 2) * 1.2);
+    const y = y0 - j * 2 - Math.floor(mod(t * 5, 2));
+    r(x, y, 1, 2, `rgba(255,255,255,${(0.75 - j * 0.11).toFixed(2)})`);
+  }
+};
+const SCENES = {
+  snowboard(r, t) {
+    r(0, 0, PW, PH, "#2b3a67");
+    for (let i = 0; i < 8; i++) r((i * 11 + 3) % PW, (i * 7) % 10, 1, 1, "#e8e3f5");
+    const slope = x => Math.floor(12 + x * 0.25);
+    for (let x = 0; x < PW; x++) { r(x, slope(x), 1, PH - slope(x), "#f4f0ff"); r(x, slope(x), 1, 1, "#c9c2e8"); }
+    const hop = Math.round(Math.abs(Math.sin(t * 2.2)) * 4);
+    const bx = 22, by = slope(bx) - hop, a = Math.floor(t * 4) % 2;
+    r(bx - 3, by - 1, 8, 1, "#ff9ecb");
+    r(bx - 1, by - 4, 1, 3, "#3b3355"); r(bx + 2, by - 4, 1, 3, "#3b3355");
+    r(bx - 1, by - 8, 4, 4, "#9ef0d0");
+    r(bx - 3, by - 7 + a, 2, 1, "#9ef0d0"); r(bx + 3, by - 8 + (1 - a), 2, 1, "#9ef0d0");
+    r(bx - 1, by - 11, 4, 3, "#ffe0bd"); r(bx - 1, by - 12, 4, 2, "#ff9ecb");
+    for (let i = 0; i < 4; i++) r(bx - 5 - i * 2 - a, slope(bx - 5 - i * 2) - 1 - (i % 2), 1, 1, "#ffffff");
+    for (let i = 0; i < 14; i++) r(mod(i * 13 - t * 4, PW), mod(i * 5 + t * 9, PH), 1, 1, "#ffffff");
+  },
+  edm(r, t) {
+    const flash = Math.floor(t * 4) % 8 === 0;
+    r(0, 0, PW, PH, flash ? "#2a1a55" : "#140b2e");
+    const cols = ["#ff9ecb", "#9ef0d0", "#c4b5fd", "#ffd98e"];
+    [8, 24, 40].forEach((cx, i) => {
+      const c = cols[(i + Math.floor(t * 2)) % 4];
+      const ang = Math.sin(t * 2 + i * 2) * 9;
+      for (let y = 0; y < 21; y++) { const x = cx + Math.round(ang * (y / 21)); r(x, y, 2, 1, c); }
+    });
+    r(0, 21, PW, 1, "#3a2a6a");
+    for (let i = 0; i < 10; i++) {
+      const x = i * 5 + 1, bob = Math.sin(t * 8 + i) > 0 ? 0 : 1;
+      r(x, 22 + bob, 3, 3, "#0a0518"); r(x - 1, 25 + bob, 5, 3, "#0a0518");
+      if ((i + Math.floor(t * 4)) % 2) { r(x - 1, 19 + bob, 1, 4, "#0a0518"); r(x + 3, 21 + bob, 1, 3, "#0a0518"); }
+      else { r(x + 3, 19 + bob, 1, 4, "#0a0518"); r(x - 1, 21 + bob, 1, 3, "#0a0518"); }
+    }
+    for (let i = 0; i < 6; i++) r(mod(i * 9 + t * 5, PW), mod(i * 7 - t * 8, 20), 1, 1, cols[i % 4]);
+  },
+  hike(r, t) {
+    r(0, 0, PW, PH, "#8ecbff"); r(0, 0, PW, 5, "#7ab8f0");
+    r(37, 5, 8, 4, "#ffe27a"); r(38, 4, 6, 6, "#ffe27a");
+    const tri = (cx, base, h, c, snow) => { for (let i = 0; i <= h; i++) { const w = Math.floor(i * 1.1); r(cx - w, base - h + i, w * 2 + 1, 1, snow && i < 3 ? "#ffffff" : c); } };
+    const o1 = mod(t * 2, PW), o2 = mod(t * 4, PW);
+    for (const k of [0, 1]) {
+      tri(10 - o1 + k * PW, 20, 12, "#8f88c8", true); tri(34 - o1 + k * PW, 20, 9, "#a59fd8", true);
+      tri(20 - o2 + k * PW, 22, 6, "#4f9a6a", false);
+    }
+    r(0, 22, PW, 6, "#3f7d4e"); r(0, 22, PW, 1, "#5fae72");
+    for (let i = 0; i < 6; i++) r(mod(i * 9 - t * 14, PW), 25, 4, 1, "#7a5a3a");
+    for (let i = 0; i < 2; i++) {
+      const x = mod(30 * i + 40 - t * 14, PW + 8) - 4;
+      r(x, 17, 5, 2, "#2f6b45"); r(x + 1, 15, 3, 2, "#2f6b45"); r(x + 2, 13, 1, 2, "#2f6b45"); r(x + 2, 19, 1, 3, "#5a3a2a");
+    }
+    const hx = 20, step = Math.floor(t * 6) % 2, y0 = 24 - (step ? 0 : 1);
+    r(hx + (step ? 1 : 0), y0 - 4, 1, 4, "#3b3355"); r(hx + 2 - (step ? 1 : 0), y0 - 4, 1, 4, "#3b3355");
+    r(hx - 2, y0 - 9, 2, 5, "#ff9ecb"); r(hx, y0 - 8, 3, 4, "#c4b5fd");
+    r(hx, y0 - 11, 3, 3, "#ffe0bd"); r(hx - 1, y0 - 12, 5, 1, "#ffd98e"); r(hx, y0 - 13, 3, 1, "#ffd98e");
+    r(hx + 4 + step, y0 - 7, 1, 7, "#e8e3f5");
+  },
+  climb(r, t) {
+    r(0, 0, PW, PH, "#4b3f66");
+    for (let y = 0; y < PH; y += 7) r(0, y, PW, 1, "#41375a");
+    [[10,4,"#ff9ecb"],[36,6,"#9ef0d0"],[14,12,"#ffd98e"],[32,15,"#c4b5fd"],[8,20,"#9ef0d0"],[38,23,"#ff9ecb"],
+     [20,3,"#ffd98e"],[26,9,"#ff9ecb"],[18,18,"#9ef0d0"],[28,24,"#c4b5fd"],[6,9,"#c4b5fd"]].forEach(([x, y, c]) => r(x, y, 3, 2, c));
+    const cx = 23, cy = 27 - mod(t * 2.5, 27), alt = Math.floor(t * 3) % 2;
+    for (let y = 0; y < cy - 7; y += 2) r(cx + 1, y, 1, 1, "#ffd98e");
+    r(cx, cy - 6, 3, 3, "#ffe0bd"); r(cx - 1, cy - 7, 5, 2, "#ffd98e"); r(cx, cy - 3, 3, 5, "#ff9ecb");
+    r(cx - 2, alt ? cy - 8 : cy - 4, 1, alt ? 5 : 4, "#ffe0bd"); r(cx + 4, alt ? cy - 4 : cy - 8, 1, alt ? 4 : 5, "#ffe0bd");
+    r(cx, cy + 2, 1, alt ? 3 : 4, "#3b3355"); r(cx + 2, cy + 2, 1, alt ? 4 : 3, "#3b3355");
+  },
+  run(r, t) {
+    r(0, 0, PW, 10, "#ff9ac1"); r(0, 10, PW, 8, "#ffb8a8"); r(0, 18, PW, 4, "#ffd9a8");
+    r(37, 12, 6, 8, "#fff3b0"); r(36, 13, 8, 6, "#fff3b0");
+    for (let x = 0; x < PW; x++) { const h = Math.floor(3 + 2 * Math.sin((x + t * 6) / 5)); r(x, 22 - h, 1, h, "#7d5a9c"); }
+    r(0, 22, PW, 6, "#3a3550"); r(0, 22, PW, 1, "#5b5478");
+    for (let i = 0; i < 5; i++) r(mod(i * 12 - t * 36, PW + 6) - 3, 25, 5, 1, "#e8e3f5");
+    const hx = 20, f = Math.floor(t * 8) % 4, y0 = 22 + (f % 2 ? -1 : 0);
+    const offA = [-2, 0, 2, 0][f], offB = [2, 0, -2, 0][f];
+    r(hx + 1 + offA, y0 - 4, 1, offA === 0 ? 3 : 4, "#3b3355"); r(hx + 1 + offB, y0 - 4, 1, offB === 0 ? 3 : 4, "#3b3355");
+    r(hx + 1, y0 - 8, 3, 4, "#9ef0d0"); r(hx + 2 + offB, y0 - 7, 1, 3, "#ffe0bd"); r(hx + 2 + offA, y0 - 7, 1, 3, "#ffe0bd");
+    r(hx + 2, y0 - 11, 3, 3, "#ffe0bd"); r(hx + 2, y0 - 11, 3, 1, "#ff9ecb"); r(hx, y0 - 10 + (f % 2), 2, 1, "#3b2a3f");
+    for (let i = 0; i < 3; i++) r(hx - 9 - i * 3 - (f % 2), y0 - 7 + i * 2, 3, 1, "rgba(255,255,255,0.6)");
+  },
+  cafe(r, t) {
+    r(0, 0, PW, PH, "#3b2a3f");
+    r(3, 3, 16, 12, "#5b4a6f"); r(4, 4, 14, 10, "#22304d"); r(10, 4, 1, 10, "#5b4a6f"); r(4, 8, 14, 1, "#5b4a6f");
+    for (let i = 0; i < 6; i++) r(5 + (i * 5) % 13, 4 + Math.floor(mod(t * 9 + i * 4, 10)), 1, 2, "#7fb2ff");
+    r(0, 22, PW, 6, "#6b4a3a"); r(0, 22, PW, 1, "#8a6450");
+    r(6, 19, 7, 3, "#e8a34f"); r(7, 18, 5, 1, "#f0b862");
+    r(17, 22, 18, 1, "#e8e3f5");
+    r(20, 14, 12, 8, "#fff5fa"); r(20, 21, 12, 1, "#e8d8e6"); r(32, 16, 3, 4, "#fff5fa"); r(33, 17, 1, 2, "#3b2a3f");
+    r(21, 14, 10, 2, "#9a6a4a"); r(24, 14, 4, 1, "#f3d9c0");
+    steam(r, 22, 12, t, 3);
+  },
+  food(r, t) {
+    r(0, 0, PW, PH, "#3a2e4a"); r(0, 23, PW, 5, "#6b4a3a"); r(0, 23, PW, 1, "#8a6450");
+    r(11, 15, 26, 1, "#ff9ecb"); r(12, 16, 24, 2, "#ff9ecb"); r(13, 18, 22, 2, "#ff9ecb"); r(15, 20, 18, 2, "#ff9ecb"); r(18, 22, 12, 1, "#ff9ecb");
+    r(12, 17, 24, 1, "#c4b5fd");
+    r(12, 14, 24, 2, "#f2b84b"); r(13, 13, 22, 1, "#f2b84b");
+    for (let i = 0; i < 5; i++) r(14 + i * 4, 12 + ((Math.floor(t * 2) + i) % 2), 3, 1, "#fff3c4");
+    r(28, 11, 5, 3, "#ffffff"); r(29, 12, 3, 2, "#ffc933");
+    r(16, 12, 2, 1, "#4caf50"); r(21, 11, 1, 2, "#4caf50"); r(24, 12, 2, 1, "#4caf50");
+    for (let i = 0; i < 8; i++) { r(40 - i, 3 + i, 1, 1, "#ffd98e"); r(42 - i, 3 + i, 1, 1, "#e8b96a"); }
+    r(39, 20, 4, 3, "#b7e36a"); r(40, 21, 2, 1, "#e6ffb0");
+    steam(r, 15, 10, t, 3);
+  },
+  us(r, t) {
+    const ell = (cx, cy, rx, ry, c) => { for (let y = -Math.ceil(ry); y <= Math.ceil(ry); y++) for (let x = -Math.ceil(rx); x <= Math.ceil(rx); x++) if ((x * x) / (rx * rx) + (y * y) / (ry * ry) <= 1) r(cx + x, cy + y, 1, 1, c); };
+    const hair = "#3a2a2e", skin = "#f2c9a5", brown = "#8b6b61", brownD = "#6f524a", green = "#2f4a3a";
+    const black = "#1f1a24", cream = "#f0e0c8", tan = "#c8925a", navy = "#2f4ea0";
+    const blink = mod(t, 4) < 0.15;
+    const dy = Math.floor(t * 3) % 2;                              // headphone bob
+    const tx = Math.floor(t * 1.5) % 4 === 0 ? 1 : 0;              // putu head tilt
+    // office backdrop
+    r(0, 0, 44, 42, "#e9dcff"); r(0, 0, 44, 14, "#efe4ff");
+    r(5, 3, 9, 1, "#fff8d6"); r(31, 2, 8, 1, "#fff8d6");
+    // sweater, arms, desk, keyboard
+    ell(22, 30, 16, 5, brown); r(6, 30, 32, 10, brown);
+    r(2, 34, 11, 4, brown); r(2, 34, 2, 4, brownD);
+    r(31, 27, 10, 10, brown); r(38, 27, 3, 10, brownD);
+    r(0, 39, 44, 3, "#b98a5a"); r(0, 40, 20, 2, "#2a2a33"); r(2, 40, 1, 1, "#4a4a55"); r(6, 40, 1, 1, "#4a4a55"); r(10, 40, 1, 1, "#4a4a55"); r(14, 40, 1, 1, "#4a4a55");
+    // me: hair, face, headphones
+    r(20, 18, 4, 4, skin);
+    ell(22, 10 + dy, 9, 8, hair);
+    ell(22, 12 + dy, 7, 7, skin);
+    r(15, 6 + dy, 15, 3, hair); r(16, 5 + dy, 13, 1, hair); r(14, 8 + dy, 2, 6, hair); r(29, 8 + dy, 2, 6, hair);
+    for (let x = 13; x <= 31; x++) r(x, 3 + Math.round(Math.pow((x - 22) / 9, 2) * 6) + dy, 1, 2, green);
+    r(12, 9 + dy, 3, 7, green); r(29, 9 + dy, 3, 7, green); r(12, 10 + dy, 1, 5, "#3f6350"); r(31, 10 + dy, 1, 5, "#3f6350");
+    if (blink) { r(19, 13 + dy, 2, 1, "#2a1a1a"); r(24, 13 + dy, 2, 1, "#2a1a1a"); }
+    else { r(19, 12 + dy, 2, 2, "#2a1a1a"); r(24, 12 + dy, 2, 2, "#2a1a1a"); r(19, 12 + dy, 1, 1, "#ffffff"); r(24, 12 + dy, 1, 1, "#ffffff"); }
+    r(17, 15 + dy, 2, 1, "#f4a6a6"); r(26, 15 + dy, 2, 1, "#f4a6a6"); r(21, 16 + dy, 3, 1, "#c97a7a");
+    // putu: body, ruff, harness, head
+    r(16, 31, 12, 8, black);
+    ell(22, 32, 7, 4, cream);
+    r(17, 34, 10, 5, navy); r(17, 33, 2, 1, navy); r(25, 33, 2, 1, navy);
+    r(21, 34, 2, 1, "#c8c8d8"); r(21, 35, 2, 4, "#1f3a80");
+    r(16, 38, 4, 2, cream); r(24, 38, 4, 2, cream); r(17, 39, 2, 1, tan); r(25, 39, 2, 1, tan);
+    r(15 + tx, 19, 4, 4, black); r(16 + tx, 18, 2, 1, black); r(26 + tx, 19, 4, 4, black); r(27 + tx, 18, 2, 1, black);
+    r(16 + tx, 20, 1, 2, tan); r(28 + tx, 20, 1, 2, tan);
+    ell(22 + tx, 26, 8, 6, black);
+    r(16 + tx, 27, 2, 2, tan); r(28 + tx, 27, 2, 2, tan);
+    ell(22 + tx, 28, 4, 3, cream);
+    r(18 + tx, 22, 2, 1, tan); r(25 + tx, 22, 2, 1, tan);
+    if (blink) { r(18 + tx, 25, 2, 1, "#0a0505"); r(25 + tx, 25, 2, 1, "#0a0505"); }
+    else { r(18 + tx, 24, 2, 2, "#0a0505"); r(25 + tx, 24, 2, 2, "#0a0505"); r(18 + tx, 24, 1, 1, "#ffffff"); r(25 + tx, 24, 1, 1, "#ffffff"); }
+    r(21 + tx, 27, 2, 1, "#0a0a0a"); r(22 + tx, 29, 1, 1, "#4a3030");
+    // music floating out of my headphones
+    ["#ff9ecb", "#7fd9b4"].forEach((c, i) => {
+      const nx = 34 + i * 3 + Math.round(Math.sin(t * 3 + i * 2)), ny = 14 - Math.floor(mod(t * 4 + i * 6, 14));
+      r(nx, ny + 2, 2, 2, c); r(nx + 1, ny, 1, 3, c);
+    });
+  }
+};
+const liveScenes = []; let sceneTimer = null; const sceneStart = performance.now();
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function paint(s, t) {
+  const g = s.g; g.imageSmoothingEnabled = false;
+  const r = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
+  try { SCENES[s.name](r, t); } catch (e) { /* unknown scene name: leave blank */ }
+}
+function initScenes(root) {
+  root.querySelectorAll("canvas[data-scene]").forEach(c => {
+    const s = { c, g: c.getContext("2d"), name: c.dataset.scene };
+    liveScenes.push(s); paint(s, 0.4);
+  });
+  if (reduceMotion || sceneTimer) return;
+  sceneTimer = setInterval(() => {
+    const t = (performance.now() - sceneStart) / 1000;
+    for (let i = liveScenes.length - 1; i >= 0; i--) {
+      const s = liveScenes[i];
+      if (!s.c.isConnected) { liveScenes.splice(i, 1); continue; }
+      paint(s, t);
+    }
+  }, 90);
+}
+
+/* ---------- visitor stats (GoatCounter, only if a site code is set above) ---------- */
+if (DATA.goatcounter) {
+  const gc = document.createElement("script");
+  gc.async = true; gc.src = "https://gc.zgo.at/count.js";
+  gc.dataset.goatcounter = `https://${DATA.goatcounter}.goatcounter.com/count`;
+  document.head.appendChild(gc);
+}
+function trackCommand(cmd) {   // shows up in your dashboard as e.g. "cmd/resume", so you can see what people open
+  try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: "cmd/" + cmd, title: cmd, event: true }); } catch (e) {}
+}
+
+/* boot sequence */
+(async function boot() {
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  el(`<div class="bannerbox"><div class="bn">✿ khin phyu khine ✿</div><div class="bs">~ personal portfolio ~</div></div>`);
+  await wait(250);
+  el(`<span class="lav">${esc(DATA.tagline)}</span>`, "line");
+  await wait(250);
+  el(`<span class="mint">✔</span> <span class="dim">loading personality…</span> done 🌈`, "line");
+  await wait(250);
+  el(`type <span class="mint">help</span> or tap a button below 👇`);
+  if (window.matchMedia("(hover: hover)").matches) input.focus();
+})();
+</script>
+</body>
+</html>
